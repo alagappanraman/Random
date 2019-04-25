@@ -1,83 +1,7 @@
 <html><head>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link href="lib/bootstrap.min.css" rel="stylesheet" type="text/css">
-	<link href="" rel="stylesheet" type="text/css">
-	<style>
-
-	input:valid {
-  color: green;
-}
-input:invalid {
-  color: red;
-}
-#wrapper{
-    height: calc(100vh - 130px);
-    box-shadow: inset 0 0 5px #ccc;
-}
-#text{
-    font-size: 30px;
-    color: darkgreen;
-    position: absolute;   
-    transform: translate(-50%,-50%);
-	}
-#time_left {
-    color: #e27373;
-    font-size: x-large;
-}
-.static{
-	top:50%;
-	left: 50%;
-}
-.light-box{
-	position:absolute;
-	top:0;
-	left:0;
-	right: 0;
-	bottom: 0;
-background-color: rgba(0,0,0,0.5);
-}
-.hide{
-	display: none;
-}
-#info_box li{
-	list-style: none;
-
-}
-#info_box{       padding: 10px;
-    text-align: center;
-	     max-height: 500%;
-    width: 300px;
-    background: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);  
-	overflow: auto;
-    height: 500px;}
-	.title{
-	    font-weight: bold;
-    padding: 10px 0px;
-    border-bottom: 1px solid #f1f1f1;
-    margin-bottom: 20px;
-    color: #033a68;
-	}
-	.expand {
-    height: 0px;
-    overflow: hidden;
-    animation: 0.3s ease-in;
-}
-.list-item {
-    box-shadow: 0 0 5px 2px #ccc;
-    margin: 5px;
-    padding: 2px 4px;
-	    display: inline-table;
-}
-.list-group{
-padding: 2px;
-    height: calc(100% - 70px);
-	    overflow: auto;
-}
-	</style>
+	<link href="word.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -95,10 +19,10 @@ padding: 2px;
 					<input type="text" name="seconds" class="form-control" pattern="\d{1,2}" value="3" placeholder="Enter Seconds //Eg: 10" title="Seconds is two digit and numeric" required>
 				</div>
 				<div class="form-group">
-					<input type="radio" class="form-check-input" name="position" checked>
-					<label class="form-check-label" for="position">Static</label>
-					<input type="radio" class="form-check-input" name="position">
-					<label class="form-check-label" for="position">Random</label>
+					<input type="radio" class="form-check-input" name="view" checked>
+					<label class="form-check-label" for="view">Word</label>
+					<input type="radio" class="form-check-input" name="view">
+					<label class="form-check-label" for="view">Image</label>
 				</div>
 			</div>
 			<div class="form-group">
@@ -121,10 +45,22 @@ padding: 2px;
 	<script>
 		var words = [];
 		var result=[]
-		$(document).ready(function(){
-			var listOfWords = data.split("\n");
-			window.localStorage.setItem('words', JSON.stringify(listOfWords));
-			loadWords();
+		$(document).ready(function(){	
+			words = data.split("\n");
+			
+			var folder = "images/";
+
+$.ajax({
+    url : folder,
+    success: function (data) {
+	console.log(data)
+        $(data).find("a").attr("href", function (i, val) {
+            if( val.match(/\.(jpe?g|png|gif)$/) ) { 
+                $("body").append( "<img src='"+ folder + val +"'>" );
+            } 
+        });
+    }
+});
 			$('#test').submit(function () {
 				$('button[type=submit]').addClass('hide');
 				$('#info-div').addClass('expand');
@@ -139,7 +75,6 @@ padding: 2px;
 			});
 		})
 		$('button[type=cancel]').click(function(){
-
 			window.location.reload();
 		})
 		$('button[type=res]').click(function(){
@@ -149,7 +84,7 @@ padding: 2px;
 			var html='<h4>Words List</h4>';
 			html +='<div class="list-group" >';
 			result.forEach(function(e) {
-				html+='<span class="list-item">'+e+'</span>'
+				html+='<span class="list-group-item">'+e+'</span>'
 			});
 			html+='</div>';
 			
@@ -161,6 +96,7 @@ padding: 2px;
 			
 		}
 		function render(min,sec,mod){
+			min = 0.1;
 			if(mod == 1){
 				//$('#text').addClass('static');
 			}
@@ -185,16 +121,13 @@ padding: 2px;
 				}
 				else{
 					$('button[type=submit]').removeAttr('disabled')
-					onLoader();
+					
+					setInterval(function() { onLoader(); }, 1000);
 					console.log('Creal')
 					clearInterval(refreshId);
 				}
 
-				var w = Math.floor(Math.random() * Math.floor(100));
-				w = w<10 ? w+10: w;
-				var h = 100-w;
-				$('#text').css('top',w+'%');
-				$('#text').css('left',h+'%');
+			
 			}, sec*1000);
 						
 		}
